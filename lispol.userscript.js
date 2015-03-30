@@ -49,10 +49,14 @@ jQuery(function ($) {
                     order
                         .getItems()
                         .getDetails()
-                        //.addQtyToProductOnList()
+                        .addQtyToProductOnList()
                         .setItems();
 
-                    //basket.getDetails();
+                    basket
+                        .getItems()
+                        .getDetails()
+                        .addQtyToProductOnList()
+                        .setItems();
 
                 },
                 findQtyNthInHeader: function ($element) {
@@ -128,7 +132,7 @@ jQuery(function ($) {
                 },
                 getDetails: function () {
                     if (!location.search.match(/\?a=order&b=show&id=[0-9]*/)) {
-                        return;
+                        return this;
                     }
 
                     if (!this._setHeadingOrderDetails() || !this._setHeadingOrderNumber() || !this._setOrderNumber()) {
@@ -136,7 +140,7 @@ jQuery(function ($) {
 
                         return this;
                     }
-
+                    
                     var orderNumber = this.$.order.number.text().trim(),
                         quantityNthChildNumber = null;
 
@@ -147,27 +151,13 @@ jQuery(function ($) {
                             this.$.order.positionsTable.find('thead td')
                         );
                         this.items[orderNumber] = this._findItemsInTableBody(
-                            this.$.order.positionsTable.find('tbody tr')
+                            this.$.order.positionsTable.find('tbody tr'),
+                            quantityNthChildNumber
                         );
+                        console.log(orderNumber, this.items[orderNumber], this.items);
                     }
 
-                    this.items.summary = {};
-
-                    $.each(this.items, function (orderId, order) {
-                        if (orderId !== 'summary') {
-                            $.each(order, function (itemId, item) {
-                                if ($.isUndefined(order.items.summary[itemId])) {
-                                    order.items.summary[itemId] = 0;
-                                }
-
-                                order.items.summary[itemId] += parseFloat(item.qty);
-                            })
-                        }
-                    });
-
-                    console.log(order.items.summary);
-
-                    return this;
+                    return this._reloadSummary();
                 },
                 addQtyToProductOnList: function () {
                     productList.$.itemQtyElements.each(function () {
@@ -184,17 +174,37 @@ jQuery(function ($) {
                     return this;
                 },
                 setItems: function () {
-                    $.setItem('order.items', order.items);
+                    console.log('setItems', this.items);
+                    $.setItem('order.items', this.items);
                 },
                 getItems: function () {
-                    order.items = $.getItem('order.items');
+                    this.items = $.getItem('order.items');
 
-                    if (!$.isObject(order.items)) {
-                        order.items = {};
+                    if (!$.isObject(this.items)) {
+                        this.items = {};
                     }
+                    
+                    console.log(this.items);
 
-                    console.log(order.items);
+                    return this;
+                },
+                _reloadSummary: function () {
+                    var self = this;
 
+                    this.items.summary = {};
+
+                    $.each(this.items, function (orderId, order) {
+                        if (orderId !== 'summary') {
+                            $.each(order, function (itemId, item) {
+                                if ($.isUndefined(self.items.summary[itemId])) {
+                                    self.items.summary[itemId] = 0;
+                                }
+
+                                self.items.summary[itemId] += parseFloat(item.qty);
+                            })
+                        }
+                    });
+                    
                     return this;
                 },
                 _findItemsInTableBody: function ($trElements, quantityNthChildNumber) {
@@ -292,9 +302,23 @@ jQuery(function ($) {
             },
             basket = {
                 items: {},
+                setItems: function () {
+                    $.setItem('basket.items', this.items);
+                },
+                getItems: function () {
+                    this.items = $.getItem('basket.items');
+
+                    if (!$.isObject(this.items)) {
+                        this.items = {};
+                    }
+
+                    console.log(this.items);
+
+                    return this;
+                },
                 getDetails: function () {
                     if (location.search != '?a=basket&b=show') {
-                        return;
+                        return this;
                     }
 
                     var $table = $('table.list1'),
@@ -303,6 +327,8 @@ jQuery(function ($) {
                         quantityNthChildNumber = common.findQtyNthInHeader($theadTd);
 
                     this.items = this._findItemsInTableBody($tbodyTr, quantityNthChildNumber);
+
+                    return this;
                 },
                 addQtyToProductOnList: function () {
                     productList.$.itemQtyElements.each(function () {
@@ -311,7 +337,7 @@ jQuery(function ($) {
 
                         if ($.isDefined(basket.items[id])) {
                             $qty.append(
-                                '<span style="color: green;">({qty})</span>'.replace('{qty}', basket.items[id])
+                                '<span style="color: green;">({qty})</span>'.replace('{qty}', basket.items[id].qty)
                             );
                         }
                     });
@@ -346,15 +372,15 @@ jQuery(function ($) {
                         id = $a.attr('href').replace(/.*id=/, '');
 
                         items[id] = {
-                            qty: $tr.find('input[id^=produkt_ile_item]')
+                            qty: parseFloat(
+                                $tr.find('input[id^=produkt_ile_item]').val()
+                            )
                         };
                     });
 
                     return items;
                 }
             };
-
-        console.log('lispol');
 
         common.init();
     };
