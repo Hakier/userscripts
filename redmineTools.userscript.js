@@ -24,6 +24,9 @@ jQuery(function ($) {
             $: {
                 btn: {
                     edit: $('#content > .contextual > a.icon.icon-edit:first')
+                },
+                container: {
+                    top: $('#content > .contextual')
                 }
             },
             issue: {
@@ -71,11 +74,13 @@ jQuery(function ($) {
 
                 this._createChild();
 
-                this._createBtnToMarkIssueDone();
-                this._createBtnToMarkIssueInProgress();
+                this
+                    ._createBtnToMarkIssueDone()
+                    ._createBtnToMarkIssueInProgress()
+                    ._createBtnToHideDoneAndInterrupted();
             },
             _isIssuePage: function () {
-                return location.pathname.match(/^\/issues\/[0-9]*$/);
+                return location.pathname.match(/^\/issues\/[0-9]*/);
             },
             _addBtnToCreateListFromNotes: function () {
                 if (!this._isIssuePage()) {
@@ -179,10 +184,10 @@ jQuery(function ($) {
             },
             _createBtnToMarkIssueDone: function () {
                 if (!location.pathname.match(/issues\/[0-9]+/)) {
-                    return;
+                    return this;
                 }
 
-                var $btnMarkAsDone = $('<a class="icon icon-save" style="margin-left: 20px; cursor: pointer;">Mark as done</a>');
+                var $btnMarkAsDone = $('<a class="icon icon-save" style="margin-right: 20px; margin-left: 20px; cursor: pointer;">Mark as done</a>');
 
                 $btnMarkAsDone.on('click', function () {
                         redmine.issue
@@ -194,14 +199,16 @@ jQuery(function ($) {
                     }
                 );
 
-                $('#content > .contextual').prepend($btnMarkAsDone);
+                this.$.container.top.prepend($btnMarkAsDone);
+
+                return this;
             },
             _createBtnToMarkIssueInProgress: function () {
-                if (!location.pathname.match(/issues\/[0-9]+/)) {
-                    return;
+                if (!this._isIssuePage()) {
+                    return this;
                 }
 
-                var $btnMarkAsInProgress = $('<a class="icon icon-save" style="margin-left: 20px; cursor: pointer;">Mark as in progress</a>');
+                var $btnMarkAsInProgress = $('<a class="icon icon-move" style="margin-left: 20px; cursor: pointer;">Mark as in progress</a>');
 
                 $btnMarkAsInProgress.on('click', function () {
                         redmine.issue
@@ -212,7 +219,34 @@ jQuery(function ($) {
                     }
                 );
 
-                $('#content > .contextual').prepend($btnMarkAsInProgress);
+                this.$.container.top.prepend($btnMarkAsInProgress);
+
+                return this;
+            },
+            _createBtnToHideDoneAndInterrupted: function () {
+                if (!this._isIssuePage()) {
+                    return this;
+                }
+
+                var $btnHideDoneAndInterrupted = $('<a class="icon icon-del" style="margin-left: 20px; cursor: pointer;">Hide done and interrupted</a>');
+
+                $btnHideDoneAndInterrupted.on('click', function () {
+                    var $statuses = $('#issue_tree .issue > td:nth-child(3)');
+
+                    $statuses.each(function () {
+                        var $this = $(this);
+
+                        if ($this.text().match('Zamknięty') || $this.text().match('Przerwany')) {
+                            $this.closest('.issue').hide();
+                        }
+                    });
+                });
+
+                this.$.container.top.prepend(
+                    $btnHideDoneAndInterrupted
+                );
+
+                return this;
             }
         };
 
