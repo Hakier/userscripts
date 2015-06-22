@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Redmine Tools
 // @namespace    http://devhq.pl/
-// @version      0.2
+// @version      0.2.1
 // @description  Set task data
 // @author       Hakier
 // @match        http://devhq.pl/redmine/*
@@ -207,7 +207,7 @@ jQuery(function ($) {
                         return this;
                     },
                     toMarkIssueInProgress: function () {
-                        var $btnMarkAsInProgress = $('<a class="icon icon-move" style="margin-left: 20px; cursor: pointer;">Mark as in <u>p</u>rogress</a>'),
+                        var $btnMarkAsInProgress = $('<a class="icon icon-move" style="margin-left: 20px; cursor: pointer;">Mark as in p<u>r</u>ogress</a>'),
                             markAsInProgress = function () {
                                 redmine.issue
                                     .assignToMe()
@@ -217,7 +217,7 @@ jQuery(function ($) {
                             };
 
                         $btnMarkAsInProgress.on('click', markAsInProgress);
-                        bindKey('alt+p', markAsInProgress);
+                        bindKey('alt+r', markAsInProgress);
                         redmine.$.container.top.prepend($btnMarkAsInProgress);
 
                         return this;
