@@ -1,13 +1,12 @@
 // ==UserScript==
 // @name         Redmine Tools
 // @namespace    http://devhq.pl/
-// @version      0.2.1
+// @version      0.2.2
 // @description  Set task data
 // @author       Hakier
 // @match        http://devhq.pl/redmine/*
 // @match        http://redmine.dpserver.pl/*
 // @grant        none
-// @require     http://code.jquery.com/jquery-latest.js
 // @require     https://raw.githubusercontent.com/jeresig/jquery.hotkeys/master/jquery.hotkeys.js
 // ==/UserScript==
 
