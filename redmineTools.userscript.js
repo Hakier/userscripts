@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Redmine Tools
 // @namespace    http://devhq.pl/
-// @version      0.2.2
+// @version      0.2.3
 // @description  Set task data
 // @author       Hakier
 // @match        http://devhq.pl/redmine/*
@@ -177,17 +177,17 @@ jQuery(function ($) {
                     init: function () {
                         debug.dump('redmine.issue.createBtn.init');
 
-                        this
-                            .toMarkIssueDone()
-                            .toMarkIssueInProgress()
-                            .toHideDoneAndInterrupted()
-                            .toCreateListFromNotes()
-                            .toCreateListOfChildrenFromNotes();
+                        this.markIssueDone();
+                        this.markIssueInProgress();
+                        this.hideDoneAndInterrupted();
+                        this.createListFromNotes();
+                        this.createListOfChildrenFromNotes();
+                        this.goToParent();
 
                         return redmine;
                     },
-                    toMarkIssueDone: function () {
-                        debug.dump('redmine.issue.createBtn.toMarkIssueDone');
+                    markIssueDone: function () {
+                        debug.dump('redmine.issue.createBtn.markIssueDone');
 
                         var $btnMarkAsDone = $('<a class="icon icon-save" style="margin-right: 20px; margin-left: 20px; cursor: pointer;">Mark as <u>d</u>one</a>'),
                             markAsDone = function () {
@@ -202,10 +202,8 @@ jQuery(function ($) {
                         $btnMarkAsDone.on('click', markAsDone);
                         redmine.$.container.top.prepend($btnMarkAsDone);
                         bindKey('alt+d', markAsDone);
-
-                        return this;
                     },
-                    toMarkIssueInProgress: function () {
+                    markIssueInProgress: function () {
                         var $btnMarkAsInProgress = $('<a class="icon icon-move" style="margin-left: 20px; cursor: pointer;">Mark as in p<u>r</u>ogress</a>'),
                             markAsInProgress = function () {
                                 redmine.issue
@@ -218,11 +216,9 @@ jQuery(function ($) {
                         $btnMarkAsInProgress.on('click', markAsInProgress);
                         bindKey('alt+r', markAsInProgress);
                         redmine.$.container.top.prepend($btnMarkAsInProgress);
-
-                        return this;
                     },
-                    toHideDoneAndInterrupted: function () {
-                        debug.dump('redmine.issue.createBtn.toHideDoneAndInterrupted');
+                    hideDoneAndInterrupted: function () {
+                        debug.dump('redmine.issue.createBtn.hideDoneAndInterrupted');
 
                         var $btnHideDoneAndInterrupted = $('<a class="icon icon-del" style="margin-left: 20px; cursor: pointer;"><u>H</u>ide done and interrupted</a>'),
                             hideDoneAndInterrupted = function () {
@@ -240,11 +236,9 @@ jQuery(function ($) {
                         $btnHideDoneAndInterrupted.on('click', hideDoneAndInterrupted);
                         redmine.$.container.top.prepend($btnHideDoneAndInterrupted);
                         bindKey('alt+h', hideDoneAndInterrupted);
-
-                        return this;
                     },
-                    toCreateListFromNotes: function () {
-                        debug.dump('redmine.issue.createBtn.toCreateListFromNotes');
+                    createListFromNotes: function () {
+                        debug.dump('redmine.issue.createBtn.createListFromNotes');
 
                         var $createListFromNoteBtn = $('<span id="create-list-from-notes" class="icon icon-edit checklist-new-only save-new-by-button" style="cursor: pointer;">Create <u>l</u>ist from note</span>'),
                             checkList = {
@@ -275,8 +269,8 @@ jQuery(function ($) {
                         checkList.getSubmit().after($createListFromNoteBtn);
                         bindKey('alt+l', createListFromNote);
                     },
-                    toCreateListOfChildrenFromNotes: function () {
-                        debug.dump('redmine.issue.createBtn.toCreateListOfChildrenFromNotes');
+                    createListOfChildrenFromNotes: function () {
+                        debug.dump('redmine.issue.createBtn.createListOfChildrenFromNotes');
 
                         var $addChildBtn = $('#issue_tree .contextual a:last-child'),
                             $addChildrenFromNotesBtn = $('<span id="add-children-from-notes" class="icon icon-edit checklist-new-only save-new-by-button" style="cursor: pointer;">Add <u>c</u>hildren from notes</span>'),
@@ -309,8 +303,16 @@ jQuery(function ($) {
 
                         $addChildBtn.before($addChildrenFromNotesBtn);
                         bindKey('alt+c', createChildrenFromNotes);
+                    },
+                    goToParent: function () {
+                        debug.dump('redmine.issue.createBtn.toGoToParent');
 
-                        return this;
+                        bindKey('alt+u', function () {
+                            var $parentLink = jQuery('#content > .issue > .subject a.issue').last(),
+                                path = $parentLink.attr('href');
+
+                            location.pathname = path;
+                        });
                     }
                 }
             },
