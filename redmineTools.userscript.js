@@ -1,5 +1,5 @@
 // ==UserScript==
-// @name         Redmine Tools
+// @name         RedmineWindow Tools
 // @namespace    http://devhq.pl/
 // @version      0.2.3
 // @description  Set task data
@@ -220,14 +220,14 @@ jQuery(function ($) {
                     hideDoneAndInterrupted: function () {
                         debug.dump('redmine.issue.createBtn.hideDoneAndInterrupted');
 
-                        var $btnHideDoneAndInterrupted = $('<a class="icon icon-del" style="margin-left: 20px; cursor: pointer;"><u>H</u>ide done and interrupted</a>'),
+                        var $btnHideDoneAndInterrupted = $('<a class="icon icon-del" style="margin-left: 20px; cursor: pointer;"><u>H</u>ide done, interrupted and testing</a>'),
                             hideDoneAndInterrupted = function () {
                                 var $statuses = $('#issue_tree .issue > td:nth-child(3)');
 
                                 $statuses.each(function () {
                                     var $this = $(this);
 
-                                    if ($this.text().match('Zamknięty') || $this.text().match('Przerwany')) {
+                                    if ($this.text().match('Zamknięty') || $this.text().match('Przerwany') || $this.text().match('Do testów')) {
                                         $this.closest('.issue').hide();
                                     }
                                 });

@@ -1,5 +1,5 @@
 // ==UserScript==
-// @name         Redmine
+// @name         RedmineWindow
 // @namespace    http://devhq.pl/
 // @version      0.1
 // @description  Set task data
